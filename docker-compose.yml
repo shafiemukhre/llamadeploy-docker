@@ -1,0 +1,31 @@
+services:
+  apiserver:
+    # Llama Deploy API server, will run the workflows
+    image: llamaindex/llama-deploy:main
+    environment:
+      OPENAI_API_KEY: $OPENAI_API_KEY
+      PINECONE_API_KEY: ${PINECONE_API_KEY}
+      LLAMA_CLOUD_API_KEY: ${LLAMA_CLOUD_API_KEY}
+      HF_TOKEN: ${HF_TOKEN}
+      TAVILY_API_KEY: ${TAVILY_API_KEY}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+      HF_LLM_URL: ${HF_LLM_URL}
+      INDEX_NAME: ${INDEX_NAME}
+      TOGETHERAI_API_KEY: ${TOGETHERAI_API_KEY}
+    ports:
+      - "4501:4501"
+    healthcheck:
+      test: llamactl status
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  deploy_workflows:
+    # Init container, it deploys python_fullstack.yaml and exits
+    image: llamaindex/llama-deploy:main
+    volumes:
+      - ./deployment.yaml:/opt/deployment.yaml
+    depends_on:
+      apiserver:
+        condition: service_healthy
+    entrypoint: llamactl -s http://apiserver:4501 -t 20 deploy /opt/deployment.yaml
