@@ -69,7 +69,8 @@ INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:4501
 ```
 
-Create a new terminal tab and run
+Go to docker, click exec and run `pip install -r requirements.txt`
 
+Create a new terminal tab and run `llamactl deploy deployment.yaml` 
 
 
